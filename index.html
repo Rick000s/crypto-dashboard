@@ -2,27 +2,201 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Crypto</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto-Dashboard Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dropdown-menu.active { display: block !important; }
+        .glass { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(12px); }
+        .btn-bounce { transition: transform 0.1s ease; }
+        .btn-bounce:active { transform: scale(0.95); }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        body { display: flex; flex-direction: column; min-height: 100vh; }
+        main { flex: 1; }
+    </style>
 </head>
-<body class="bg-gray-900 text-white p-10">
-    <nav class="flex justify-between items-center border-b border-gray-700 pb-5">
-        <h1 class="text-2xl font-bold">CryptoDash</h1>
-        <div class="space-x-4">
-            <button id="btn-market" class="text-blue-400">Market</button>
-            <button id="btn-portfolio">Portfolio</button>
+<body class="bg-gray-900 text-white font-sans">
+
+    <nav class="flex justify-between items-center border-b border-gray-800 p-5 glass sticky top-0 z-50">
+        <h1 onclick="showSection('home-view')" class="text-xl md:text-2xl font-black cursor-pointer bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent italic tracking-tighter">CRYPTO-DASHBOARD</h1>
+        
+        <div class="flex items-center gap-4 md:gap-6">
+            <select id="lang-select" onchange="changeLanguage()" class="bg-gray-800 border border-gray-700 text-[10px] font-bold rounded-lg px-2 py-1 outline-none focus:border-blue-500 cursor-pointer uppercase">
+                <option value="en">EN</option>
+                <option value="uk">UK</option>
+                <option value="cs">CS</option>
+            </select>
+
+            <select id="currency-select" onchange="updateCurrencyDisplay()" class="bg-gray-800 border border-gray-700 text-[10px] font-bold rounded-lg px-2 py-1 outline-none focus:border-blue-500 cursor-pointer">
+                <option value="usd">USD ($)</option>
+                <option value="eur">EUR (€)</option>
+                <option value="czk">CZK (Kč)</option>
+            </select>
+
+            <div class="hidden md:flex gap-6 text-[10px] font-bold uppercase tracking-widest">
+                <button onclick="showSection('home-view')" class="hover:text-blue-400 transition" data-i18n="nav_home">Home</button>
+                <button onclick="showSection('market-view')" class="hover:text-blue-400 transition" data-i18n="nav_market">Market</button>
+                <button onclick="showSection('portfolio-view')" class="hover:text-blue-400 transition" data-i18n="nav_portfolio">Portfolio</button>
+            </div>
+
+            <div id="user-section" class="relative">
+                <div id="user-badge" onclick="toggleMenu(event)" class="flex items-center gap-3 cursor-pointer p-1 pr-3 hover:bg-gray-800 rounded-full transition border border-transparent hover:border-gray-700"></div>
+                <div id="profile-menu" class="dropdown-menu hidden absolute right-0 mt-3 w-52 bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl overflow-hidden z-[100]">
+                    <button onclick="openEditModal()" class="w-full text-left px-5 py-3 text-sm hover:bg-gray-700 transition border-b border-gray-700/50" data-i18n="edit_profile">⚙️ Edit Profile</button>
+                    <button onclick="logout()" class="w-full text-left px-5 py-3 text-sm hover:bg-red-900/20 text-red-400 transition" data-i18n="logout">🚪 Logout</button>
+                </div>
+            </div>
         </div>
     </nav>
 
-    <main class="p-10">
-        <section id="market-view">
-            <h2 class="text-2xl font-bold mb-5">Crypto Market</h2>
+    <main class="max-w-7xl w-full mx-auto p-6 md:p-10">
+        
+        <section id="home-view" class="py-10">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl md:text-7xl font-black mb-6 uppercase italic leading-tight">
+                    <span data-i18n="home_title">Smart Trading</span> <br><span class="text-blue-500 italic" data-i18n="home_subtitle">Redefined</span>
+                </h2>
+                <p class="text-gray-400 max-w-2xl mx-auto text-lg" data-i18n="home_desc">Your personal asset management center. Trade seamlessly across markets.</p>
+            </div>
 
-            <div id="crypto-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <p class="text-gray-500">Loading prices...</p>
+            <div id="favorites-section" class="mb-14 hidden">
+                <h3 class="text-xl font-bold mb-6 flex items-center gap-2 italic uppercase text-yellow-400" data-i18n="favorites_title">⭐ FAVORITES</h3>
+                <div id="favorites-grid" class="grid grid-cols-1 md:grid-cols-4 gap-4"></div>
+            </div>
+
+            <div class="mb-20">
+                <h3 class="text-xl font-bold mb-6 flex items-center gap-2 italic uppercase" data-i18n="trending_title">🔥 TRENDING ASSETS</h3>
+                <div id="trending-grid" class="grid grid-cols-1 md:grid-cols-4 gap-4"></div>
+            </div>
+
+            <div class="mb-10">
+                <h3 class="text-3xl font-black mb-8 text-center uppercase italic text-gray-700" data-i18n="features_title">Why Choose Us</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-gray-800/50 p-8 rounded-3xl border border-gray-800 text-center hover:bg-gray-800 transition">
+                        <div class="text-4xl mb-4">⚡</div>
+                        <h4 class="text-xl font-bold mb-2 text-blue-400" data-i18n="feat_1">Lightning Fast</h4>
+                        <p class="text-gray-500 text-sm" data-i18n="feat_1_d">Execute trades instantly with zero delay.</p>
+                    </div>
+                    <div class="bg-gray-800/50 p-8 rounded-3xl border border-gray-800 text-center hover:bg-gray-800 transition">
+                        <div class="text-4xl mb-4">🛡️</div>
+                        <h4 class="text-xl font-bold mb-2 text-emerald-400" data-i18n="feat_2">Bank-Grade Security</h4>
+                        <p class="text-gray-500 text-sm" data-i18n="feat_2_d">Your assets are protected by top-tier encryption.</p>
+                    </div>
+                    <div class="bg-gray-800/50 p-8 rounded-3xl border border-gray-800 text-center hover:bg-gray-800 transition">
+                        <div class="text-4xl mb-4">📊</div>
+                        <h4 class="text-xl font-bold mb-2 text-yellow-400" data-i18n="feat_3">Live Data</h4>
+                        <p class="text-gray-500 text-sm" data-i18n="feat_3_d">Get real-time market updates and accurate charts.</p>
+                    </div>
+                </div>
             </div>
         </section>
+
+        <section id="market-view" class="hidden">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-12">
+                <h2 class="text-4xl font-black italic uppercase" data-i18n="market_title">Market</h2>
+                <div class="relative w-full md:w-96">
+                    <input id="search-input" type="text" placeholder="Search HBAR, BTC..." data-i18n-ph="search_ph" class="w-full bg-gray-800 border border-gray-700 p-4 pr-14 rounded-2xl outline-none focus:border-blue-500 transition">
+                    <button id="search-btn" class="btn-bounce absolute right-3 top-2.5 p-2 bg-blue-600 rounded-xl hover:bg-blue-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    </button>
+                </div>
+            </div>
+            <div id="market-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+        <section id="portfolio-view" class="hidden">
+            <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-3xl border border-gray-700 mb-10 shadow-2xl">
+                <p class="text-gray-500 text-xs font-bold uppercase mb-2" data-i18n="avail_balance">Available Balance</p>
+                <h2 id="port-balance-display" class="text-5xl font-mono font-bold text-emerald-400">0.00</h2>
+            </div>
+            <div id="portfolio-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
     </main>
+
+    <footer class="border-t border-gray-800 py-8 text-center text-gray-600 text-xs mt-auto">
+        <p data-i18n="footer_text">© 2026 Crypto-Dashboard Pro. All rights reserved.</p>
+    </footer>
+
+    <div id="chart-modal" class="fixed inset-0 bg-black/95 hidden items-center justify-center z-[80] p-4 backdrop-blur-lg">
+        <div class="bg-gray-800 p-6 rounded-3xl w-full max-w-5xl border border-gray-700 relative overflow-y-auto max-h-[95vh]">
+            <button onclick="closeModal('chart-modal')" class="absolute top-6 right-6 text-gray-500 text-4xl hover:text-white transition">&times;</button>
+            
+            <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                <div>
+                    <div class="flex items-center gap-3">
+                        <h2 id="modal-coin-title" class="text-3xl font-black italic text-blue-400 leading-none">COIN</h2>
+                        <button id="fav-btn" onclick="toggleFavorite()" class="text-2xl transition hover:scale-110 mt-1 cursor-pointer">☆</button>
+                    </div>
+                    <p id="modal-coin-price" class="text-xl font-mono text-gray-400 mt-2"></p>
+                </div>
+                
+                <div class="flex bg-gray-900/50 p-1 rounded-xl border border-gray-700">
+                    <button onclick="changeInterval('0.01')" class="int-btn px-3 py-1 text-[10px] font-bold rounded-lg transition hover:text-white text-gray-500" data-int="0.01">15M</button>
+                    <button onclick="changeInterval('0.04')" class="int-btn px-3 py-1 text-[10px] font-bold rounded-lg transition hover:text-white text-gray-500" data-int="0.04">1H</button>
+                    <button onclick="changeInterval('0.5')" class="int-btn px-3 py-1 text-[10px] font-bold rounded-lg transition hover:text-white text-gray-500" data-int="0.5">12H</button>
+                    <button onclick="changeInterval('1')" class="int-btn px-3 py-1 text-[10px] font-bold rounded-lg transition hover:text-white text-blue-400" data-int="1">24H</button>
+                    <button onclick="changeInterval('7')" class="int-btn px-3 py-1 text-[10px] font-bold rounded-lg transition hover:text-white text-gray-500" data-int="7">7D</button>
+                    <button onclick="changeInterval('31')" class="int-btn px-3 py-1 text-[10px] font-bold rounded-lg transition hover:text-white text-gray-500" data-int="31">31D</button>
+                </div>
+            </div>
+            
+            <div class="h-[300px] md:h-[400px] mb-8"><canvas id="mainChart"></canvas></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-900/50 p-6 rounded-2xl border border-gray-700">
+                <div class="space-y-3">
+                    <div class="flex justify-between text-[10px] font-bold uppercase px-2 text-emerald-500">
+                        <span data-i18n="buy_limit">Buy Limit</span>
+                        <span id="buy-limit"></span>
+                    </div>
+                    <div class="flex gap-3">
+                        <input id="buy-val" type="number" step="any" placeholder="Amount" data-i18n-ph="amount_ph" class="flex-1 bg-gray-800 border border-gray-700 p-4 rounded-xl outline-none focus:border-emerald-500 font-mono">
+                        <button onclick="executeTrade('buy')" class="bg-emerald-600 hover:bg-emerald-700 px-8 rounded-xl font-black italic transition btn-bounce shadow-lg shadow-emerald-900/50" data-i18n="buy_btn">BUY</button>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex justify-between text-[10px] font-bold uppercase px-2 text-red-500">
+                        <span data-i18n="sell_limit">Available to Sell</span>
+                        <span id="sell-limit"></span>
+                    </div>
+                    <div class="flex gap-3">
+                        <input id="sell-val" type="number" step="any" placeholder="Amount" data-i18n-ph="amount_ph" class="flex-1 bg-gray-800 border border-gray-700 p-4 rounded-xl outline-none focus:border-red-500 font-mono">
+                        <button onclick="executeTrade('sell')" class="bg-red-600 hover:bg-red-700 px-8 rounded-xl font-black italic transition btn-bounce shadow-lg shadow-red-900/50" data-i18n="sell_btn">SELL</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="edit-modal" class="fixed inset-0 bg-black/90 hidden items-center justify-center z-[110] p-4 backdrop-blur-md">
+        <div class="bg-gray-800 p-8 rounded-3xl border border-gray-700 w-full max-w-md">
+            <h2 class="text-2xl font-bold mb-6 italic text-blue-400" data-i18n="edit_profile_title">EDIT PROFILE</h2>
+            <div class="space-y-4">
+                <input id="edit-username" type="text" placeholder="New Username" data-i18n-ph="new_user_ph" class="w-full bg-gray-900 border border-gray-700 p-4 rounded-xl outline-none focus:border-blue-500">
+                <input id="edit-avatar" type="text" placeholder="Avatar URL (Optional)" data-i18n-ph="avatar_ph" class="w-full bg-gray-900 border border-gray-700 p-4 rounded-xl outline-none focus:border-blue-500">
+                <input id="edit-password" type="password" placeholder="New Password" data-i18n-ph="new_pass_ph" class="w-full bg-gray-900 border border-gray-700 p-4 rounded-xl outline-none focus:border-blue-500">
+                <div class="flex gap-3 pt-4">
+                    <button onclick="saveProfile()" class="flex-1 bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-bold transition btn-bounce" data-i18n="save">SAVE</button>
+                    <button onclick="closeModal('edit-modal')" class="flex-1 bg-gray-700 hover:bg-gray-600 py-4 rounded-xl font-bold transition" data-i18n="cancel">CANCEL</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="auth-modal" class="fixed inset-0 bg-black/95 hidden items-center justify-center z-[110] p-4">
+        <div class="bg-gray-800 p-8 rounded-3xl border border-gray-700 w-full max-w-md">
+            <button onclick="closeModal('auth-modal')" class="absolute top-6 right-6 text-gray-500 text-3xl hover:text-white">&times;</button>
+            <h2 id="auth-title" class="text-3xl font-black mb-8 text-center uppercase italic" data-i18n="sign_in">Sign In</h2>
+            <div id="reg-fields" class="hidden">
+                <input id="auth-user" type="text" placeholder="Username" data-i18n-ph="user_ph" class="w-full bg-gray-900 border border-gray-700 p-4 rounded-xl mb-4 outline-none focus:border-blue-500 transition">
+            </div>
+            <input id="auth-email" type="email" placeholder="Email" class="w-full bg-gray-900 border border-gray-700 p-4 rounded-xl mb-4 outline-none focus:border-blue-500 transition">
+            <input id="auth-pass" type="password" placeholder="Password" data-i18n-ph="pass_ph" class="w-full bg-gray-900 border border-gray-700 p-4 rounded-xl mb-8 outline-none focus:border-blue-500 transition">
+            <button id="auth-btn" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-black text-lg btn-bounce shadow-lg shadow-blue-900/50" data-i18n="continue">CONTINUE</button>
+            <p onclick="toggleAuth()" class="text-center mt-6 text-sm text-gray-500 cursor-pointer hover:text-white transition" id="auth-toggle-text">New here? Create account</p>
+        </div>
+    </div>
+
     <script src="app.js"></script>
-    </body>
+</body>
 </html>
