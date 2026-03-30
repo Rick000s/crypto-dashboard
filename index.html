@@ -6,15 +6,7 @@
     <title>Crypto-Dashboard Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .dropdown-menu.active { display: block !important; }
-        .glass { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(12px); }
-        .btn-bounce { transition: transform 0.1s ease; }
-        .btn-bounce:active { transform: scale(0.95); }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        body { display: flex; flex-direction: column; min-height: 100vh; }
-        main { flex: 1; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-gray-900 text-white font-sans">
 
@@ -22,6 +14,12 @@
         <h1 onclick="showSection('home-view')" class="text-xl md:text-2xl font-black cursor-pointer bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent italic tracking-tighter">CRYPTO-DASHBOARD</h1>
         
         <div class="flex items-center gap-4 md:gap-6">
+            <select id="theme-select" onchange="changeTheme()" class="bg-gray-800 border border-gray-700 text-[10px] font-bold rounded-lg px-2 py-1 outline-none focus:border-blue-500 cursor-pointer uppercase">
+    <option value="default">Default</option>
+    <option value="light">Light</option>
+    <option value="black">Midnight</option>
+</select>
+
             <select id="lang-select" onchange="changeLanguage()" class="bg-gray-800 border border-gray-700 text-[10px] font-bold rounded-lg px-2 py-1 outline-none focus:border-blue-500 cursor-pointer uppercase">
                 <option value="en">EN</option>
                 <option value="uk">UK</option>
@@ -106,10 +104,10 @@
         </section>
 
         <section id="portfolio-view" class="hidden">
-            <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-3xl border border-gray-700 mb-10 shadow-2xl">
-                <p class="text-gray-500 text-xs font-bold uppercase mb-2" data-i18n="avail_balance">Available Balance</p>
-                <h2 id="port-balance-display" class="text-5xl font-mono font-bold text-emerald-400">0.00</h2>
-            </div>
+            <div class="p-8 rounded-3xl border mb-10 shadow-2xl balance-card">
+    <p class="text-xs font-bold uppercase mb-2 balance-label" data-i18n="avail_balance">Available Balance</p>
+    <h2 id="port-balance-display" class="text-5xl font-mono font-bold balance-amount">0.00</h2>
+</div>
             <div id="portfolio-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             <div class="mt-12">
     <h3 class="text-xl font-bold mb-6 italic uppercase text-gray-400">📜 Transaction History</h3>

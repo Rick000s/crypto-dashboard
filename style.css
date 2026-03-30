@@ -1,0 +1,117 @@
+/* Змінні кольорів для тем */
+:root {
+    --bg-body: #111827;
+    --bg-card: #1f2937; 
+    --text-main: #ffffff;
+    --text-muted: #9ca3af; 
+    --border-color: #374151; 
+    --nav-bg: rgba(17, 24, 39, 0.8);
+}
+
+[data-theme="light"] {
+    /* Фон всієї сторінки (димчасто-сірий) */
+    --bg-body: #c2c0c0; 
+    
+    /* Картки та модалки (світліші за фон, щоб "випирали") */
+    --bg-card: #d1d1d1; 
+    
+    /* Текст - майже чорний для максимального контрасту */
+    --text-main: #0f172a;
+    --text-muted: #334155; 
+    
+    /* Бордери - трохи темніші за картки */
+    --border-color: #94a3b8; 
+    
+    /* Навігація */
+    --nav-bg: rgba(177, 177, 177, 0.9);
+}
+
+[data-theme="black"] {
+    --bg-body: #000000; 
+    --bg-card: #0a0a0a; 
+    --text-main: #eeeeee;
+    --text-muted: #888888; 
+    --border-color: #1a1a1a; 
+    --nav-bg: rgba(0, 0, 0, 0.95);
+}
+
+/* Глобальні стилі */
+body { 
+    background-color: var(--bg-body) !important; 
+    color: var(--text-main) !important; 
+    transition: all 0.3s ease; 
+}
+
+/* Навігація та скляні ефекти */
+.glass { 
+    background: var(--nav-bg) !important; 
+    border-bottom: 1px solid var(--border-color) !important; 
+}
+
+/* Картки, Модалки та Таблиці */
+.bg-gray-800, .bg-gray-900, .bg-gray-800\/50, .bg-gray-900\/50, 
+#chart-modal > div, .modal-content, table, thead { 
+    background-color: var(--bg-card) !important; 
+    border-color: var(--border-color) !important; 
+}
+
+/* Поля вводу та селектори */
+input, select { 
+    background-color: var(--bg-body) !important; 
+    border-color: var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+
+/* Текст - оновлено для гарантованої зміни кольору тьмяних текстів */
+.text-white, h1, h2, h3, h4, .text-3xl, .text-5xl, .text-xl, strong, b { 
+    color: var(--text-main) !important; 
+}
+
+/* Охоплюємо тьмяні тексти: text-gray-*, text-xs, та деякі p */
+.text-gray-400, .text-gray-500, .text-gray-600, .text-xs, p:not(.text-main), 
+span:not(.text-emerald-400):not(.text-red-400):not(.text-yellow-500) { 
+    color: var(--text-muted) !important; 
+}
+
+/* Окреме правило для текстів в Nav bar, які можуть бути тьмяними */
+nav [class*="text-gray-"] {
+    color: var(--text-muted) !important;
+}
+
+/* Бордери */
+.border, .border-gray-800, .border-gray-700, .border-b, .border-t { 
+    border-color: var(--border-color) !important; 
+}
+
+/* Додаткові ефекти */
+.dropdown-menu.active { display: block !important; }
+.btn-bounce { transition: transform 0.1s ease; }
+.btn-bounce:active { transform: scale(0.95); }
+
+/* Фікс для графіка */
+canvas { filter: brightness(var(--theme-brightness, 1)); }
+[data-theme="light"] { --theme-brightness: 0.9; }
+
+/* Приховуємо стрілочки в input number */
+input::-webkit-outer-spin-button, 
+input::-webkit-inner-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+}
+
+/* Специфічні стилі для картки балансу */
+.balance-card {
+    background-color: var(--bg-card) !important;
+    border-color: var(--border-color) !important;
+}
+
+.balance-label {
+    color: var(--text-muted) !important; /* У Midnight буде світлішим, у Light - темнішим */
+}
+
+.balance-amount {
+    /* Якщо хочеш, щоб баланс завжди був зеленим, залиш так: */
+    color: #34d399 !important; 
+    /* Або, якщо хочеш, щоб він теж мінявся під тему: */
+    /* color: var(--text-main) !important; */
+}

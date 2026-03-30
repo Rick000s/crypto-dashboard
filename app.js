@@ -512,6 +512,26 @@ document.getElementById('search-btn').onclick = async () => {
     }
 };
 
+// --- СИСТЕМА ТЕМ ---
+let currentTheme = localStorage.getItem('pref_theme') || 'default';
+document.documentElement.setAttribute('data-theme', currentTheme);
+document.getElementById('theme-select').value = currentTheme;
+
+function changeTheme() {
+    currentTheme = document.getElementById('theme-select').value;
+    localStorage.setItem('pref_theme', currentTheme);
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    
+    // Оновлюємо колір сітки графіка, якщо він існує
+    if (chartInstance) {
+        const isLight = currentTheme === 'light';
+        chartInstance.options.scales.y.grid.color = isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)';
+        chartInstance.options.scales.x.ticks.color = isLight ? '#4b5563' : '#6b7280';
+        chartInstance.options.scales.y.ticks.color = isLight ? '#4b5563' : '#6b7280';
+        chartInstance.update();
+    }
+}
+
 // Запуск
 applyTranslations();
 updateUI();
