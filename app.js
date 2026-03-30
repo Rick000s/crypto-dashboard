@@ -365,14 +365,47 @@ function executeTrade(type) {
         currentUser.portfolio[activeCoin.id] -= amount;
         if (currentUser.portfolio[activeCoin.id] <= 0) delete currentUser.portfolio[activeCoin.id];
     }
-    
+
+    // --- НОВИЙ БЛОК: ЗАПИС В ІСТОРІЮ ---
+    if (!currentUser.history) currentUser.history = [];
+    currentUser.history.unshift({
+        type: type.toUpperCase(),
+        symbol: activeCoin.symbol.toUpperCase(),
+        amount: amount,
+        price: activeCoin.current_price,
+        time: new Date().toLocaleTimeString('en-US', { hour12: false })
+    });
+    // Тримаємо тільки останні 20 транзакцій
+    if (currentUser.history.length > 20) currentUser.history.pop();
+    // ----------------------------------
+
     saveUser(); 
     input.value = ''; 
     updateUI(); 
     updateModalInfo();
+    loadPortfolio();
+}
+
+// Додамо функцію для рендеру таблиці історії в loadPortfolio
+const originalLoadPortfolio = loadPortfolio;
+loadPortfolio = async function() {
+    await originalLoadPortfolio();
+    renderHistory();
+};
+
+function renderHistory() {
+    const tbody = document.getElementById('history-table-body');
+    if (!tbody || !currentUser || !currentUser.history) return;
     
-    // Ми викликаємо завантаження портфеля відразу після угоди
-    loadPortfolio(); 
+    tbody.innerHTML = currentUser.history.map(h => `
+        <tr class="border-t border-gray-700/50 hover:bg-gray-700/30 transition">
+            <td class="px-6 py-4 font-black ${h.type === 'BUY' ? 'text-emerald-400' : 'text-red-400'}">${h.type}</td>
+            <td class="px-6 py-4 text-white">${h.symbol}</td>
+            <td class="px-6 py-4 text-gray-300">${h.amount.toFixed(4)}</td>
+            <td class="px-6 py-4 text-gray-400">${formatPrice(h.price)}</td>
+            <td class="px-6 py-4 text-right text-gray-500 text-xs">${h.time}</td>
+        </tr>
+    `).join('');
 }
 
 function updateUI() {
